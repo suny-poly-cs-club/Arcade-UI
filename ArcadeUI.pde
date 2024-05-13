@@ -1,9 +1,9 @@
 //first* funtion called from this program by processing
 void setup(){
   //start in fullscreen mode with the 3D OpenGL rederer
-  //fullScreen(P3D);
+  fullScreen(P3D);
   
-  size(1280,1024,P3D);//manauly set window size for testing
+  //size(1280,1024,P3D);//manauly set window size for testing
   
   
   
@@ -18,12 +18,18 @@ void setup(){
   //this text is renderd when textSize is called for the first time
   //while this has a major seed benifit it causes test that is sized farm the the initial size to have noticable scale ing artifacts
   
+  Game.initClass(this);
+  
+  games.add(new Game());//tmp
+  
   //initilize text and buttons that require the UI Frame
   initilizeText();
   initilizeButtons();
 }
 
 UiFrame ui;
+
+ArrayList<Game> games = new ArrayList<>();
 
 //main render function 
 //automcaticaly called by the render theread once every frame
@@ -37,13 +43,23 @@ void draw(){
   fill(255);
   titleText.draw();
   
+  //draw the main pannel with the game info
   renderGameSelection(0);
+  
 }
 
 /**draws the main part of the selection UI 
 */
 void renderGameSelection(int gameId){
+  prevGameButton.draw();
+  nextGameButton.draw();
   
+  Game currentGame = games.get(gameId);
+  
+  image(currentGame.getImg(),ui.topX()+600*ui.scale(),ui.topY()+250*ui.scale());
+  
+  currentGame.getName(gameName);
+  gameName.draw();
 }
 
 //if the window is resized
