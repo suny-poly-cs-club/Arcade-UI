@@ -51,15 +51,40 @@ void draw(){
 /**draws the main part of the selection UI 
 */
 void renderGameSelection(int gameId){
+  //next and last gamen buttons
   prevGameButton.draw();
   nextGameButton.draw();
   
   Game currentGame = games.get(gameId);
   
+  //game image
   image(currentGame.getImg(),ui.topX()+600*ui.scale(),ui.topY()+250*ui.scale());
   
+  //game name 
   currentGame.getName(gameName);
+  fill(color(255,190));
   gameName.draw();
+  
+  //leaderBoard
+  fill(#002C73);
+  uiRect(80,160,400,60);
+  fill(255);
+  leaderBoardTitle.draw();
+  
+  //check if multiple leaderBoards
+  leaderBoardName.draw();
+  prevLeaderBoard.draw();
+  nextLeaderBoard.draw();
+  
+  fill(255);
+  
+  //populate leaderBoard Info
+  for(int i=0; i< leaderBoardContent.length;i++){
+    leaderBoardContent[i].draw();
+  }
+  
+  //play button
+  playButton.draw();
 }
 
 //if the window is resized
