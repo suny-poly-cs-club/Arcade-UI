@@ -20,16 +20,24 @@ void setup(){
   
   Game.initClass(this);
   
-  games.add(new Game());//tmp
-  
   //initilize text and buttons that require the UI Frame
   initilizeText();
   initilizeButtons();
+  
+  loading=true;
+  //load all the game info on a seperate thread incase the drive is slow
+  thread("loadGames");
 }
 
 UiFrame ui;
 
 ArrayList<Game> games = new ArrayList<>();
+
+int currentLeaderBoardLevel =0;
+
+String gameConfigFile = "data/games.csv";
+
+boolean loading = true;
 
 //main render function 
 //automcaticaly called by the render theread once every frame
@@ -37,14 +45,22 @@ void draw(){
   background(0);//set the background color to black clearing anything currently on screen
   noStroke();//stroke with the 3D render can be kinda anoying
   
-  //title bar
-  fill(#002C73);
-  uiRect(20,20,1240,130);
-  fill(255);
-  titleText.draw();
-  
-  //draw the main pannel with the game info
-  renderGameSelection(0);
+  //if loading do not display the normal UI instead display loading unill the load has completed
+  if(loading){
+    //I know this is not the most scl;eable thing but it should be fine
+    fill(255);
+    textSize(100);
+    text("Loading ...",width/2,height/2);
+  }else{
+    //title bar
+    fill(#002C73);
+    uiRect(20,20,1240,130);
+    fill(255);
+    titleText.draw();
+    
+    //draw the main pannel with the game info
+    renderGameSelection(0);
+  }
   
 }
 
@@ -70,21 +86,38 @@ void renderGameSelection(int gameId){
   uiRect(80,160,400,60);
   fill(255);
   leaderBoardTitle.draw();
+  if(currentGame.leaderBoardPresent()){
+    if(currentGame.hasAdvancedLeaderBoard()){
+      //check if multiple leaderBoards
+      currentGame.getLevelName(leaderBoardName,currentLeaderBoardLevel);
+      leaderBoardName.draw();
+      prevLeaderBoard.draw();
+      nextLeaderBoard.draw();
+    }
+    fill(255);
+    currentGame.populateScores(leaderBoardContent,currentLeaderBoardLevel);
+    //populate leaderBoard Info
+    for(int i=0; i< leaderBoardContent.length;i++){
+      leaderBoardContent[i].draw();
+    }
   
-  //check if multiple leaderBoards
-  leaderBoardName.draw();
-  prevLeaderBoard.draw();
-  nextLeaderBoard.draw();
-  
-  fill(255);
-  
-  //populate leaderBoard Info
-  for(int i=0; i< leaderBoardContent.length;i++){
-    leaderBoardContent[i].draw();
   }
-  
   //play button
   playButton.draw();
+}
+
+void loadGames(){
+  //read the game info file
+  String[] rawGameinfo = loadStrings(gameConfigFile);
+  //pargse the contetnce into useable objects
+  for(String gameInfo: rawGameinfo){
+    try{
+      games.add(new Game(gameInfo.split(",")));
+    }catch (Exception e){
+      e.printStackTrace();
+    }
+  }
+  loading=false;
 }
 
 //if the window is resized
