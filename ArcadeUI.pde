@@ -40,17 +40,23 @@ ArrayList<Game> games = new ArrayList<>();
 
 int currentLeaderBoardLevel =0;
 
-int currentGameIndex =0;
+int currentGameIndex =0,prevousGameIndex=0;
 
 String gameConfigFile = "data/games.csv";
 
 boolean loading = true, controllerError=false;
+boolean animationRight = false, animationLeft= false;
 
 Process runningGame;
 
 GamePadWrapper controller = new GamePadWrapper();
 
-int controlerErrorTimeStamp=0,lastControllUseTime=0,errorTimeStamp=0;
+int controlerErrorTimeStamp=0,lastControllUseTime=0,errorTimeStamp=0,animationStartTimestamp;
+
+float defCameraFOV = 60 * DEG_TO_RAD; // at least for now
+float defCameraX = width / 2.0f;
+float defCameraY = height / 2.0f;
+float defCameraZ = defCameraY / ((float) Math.tan(defCameraFOV / 2.0f));
 
 
 // 0=prevGame 1=prevLreaderBoard 2=nextLeaderBoard 3=play 4=nextGame
@@ -59,6 +65,7 @@ int selectedButton =3;
 //main render function 
 //automcaticaly called by the render theread once every frame
 void draw(){
+  camera();//reset the camera
   if(controllerError){
     background(200);
     textSize(100);
@@ -136,11 +143,36 @@ void draw(){
     fill(255);
     titleText.draw();
     
-    //draw the main pannel with the game info
-    renderGameSelection(currentGameIndex);
-    if(errorTimeStamp+5000>millis() && millis()>5000){
-      fill(255,0,0);
-      errorText.draw();
+    if(animationRight){
+      float animationPercent = (millis()-animationStartTimestamp)/3000.0;
+      float xoffset = 3000*animationPercent*animationPercent , zoffset = -1000*animationPercent*(animationPercent-1);
+      camera(defCameraX+xoffset, defCameraY, defCameraZ+zoffset, defCameraX+xoffset, defCameraY, zoffset, 0,1,0);
+      renderGameSelection(prevousGameIndex);
+      translate(3000,0,0);
+      renderGameSelection(currentGameIndex);
+      translate(-6000,0,0);
+      if(animationPercent>=1){
+        animationRight=false;
+      }
+    }else if(animationLeft){
+      float animationPercent = (millis()-animationStartTimestamp)/3000.0;
+      float xoffset = -3000*animationPercent*animationPercent , zoffset = -1000*animationPercent*(animationPercent-1);
+      camera(defCameraX+xoffset, defCameraY, defCameraZ+zoffset, defCameraX+xoffset, defCameraY, zoffset, 0,1,0);
+      renderGameSelection(prevousGameIndex);
+      translate(-3000,0,0);
+      renderGameSelection(currentGameIndex);
+      translate(3000,0,0);
+      if(animationPercent>=1){
+        animationLeft=false;
+      }
+    }else{
+    
+      //draw the main pannel with the game info
+      renderGameSelection(currentGameIndex);
+      if(errorTimeStamp+5000>millis() && millis()>5000){
+        fill(255,0,0);
+        errorText.draw();
+      }
     }
   }
   
@@ -203,19 +235,25 @@ void mousePressed(){
     
     if(prevGameButton.isMouseOver()){
       currentLeaderBoardLevel=0;
+      prevousGameIndex = currentGameIndex;
       if(currentGameIndex >0){
         currentGameIndex--;
       }else{
         currentGameIndex = games.size()-1;
       }
+      animationLeft=true;
+      animationStartTimestamp = millis();
     }
     if(nextGameButton.isMouseOver()){
       currentLeaderBoardLevel=0;
+      prevousGameIndex = currentGameIndex;
       if(currentGameIndex <games.size()-1){
         currentGameIndex++;
       }else{
         currentGameIndex = 0;
       }
+      animationRight=true;
+      animationStartTimestamp = millis();
     }
     
     if(playButton.isMouseOver()){
@@ -328,6 +366,10 @@ void windowResized() {
   for(int i=0;i<games.size();i++){
     games.get(i).rescale(ui.scale());
   }
+  
+  defCameraX = width / 2.0f;
+  defCameraY = height / 2.0f;
+  defCameraZ = defCameraY / ((float) Math.tan(defCameraFOV / 2.0f));
 }
 
 
