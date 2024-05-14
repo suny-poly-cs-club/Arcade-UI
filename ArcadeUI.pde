@@ -1,3 +1,7 @@
+import net.java.games.input.*;//theese imports are nessary to get processing to include the library in the export
+import net.java.games.util.plugins.*;
+import net.java.games.util.*;
+
 //first* funtion called from this program by processing
 void setup(){
   //start in fullscreen mode with the 3D OpenGL rederer
@@ -24,6 +28,7 @@ void setup(){
   initilizeText();
   initilizeButtons();
   
+  
   loading=true;
   //load all the game info on a seperate thread incase the drive is slow
   thread("loadGames");
@@ -39,23 +44,92 @@ int currentGameIndex =0;
 
 String gameConfigFile = "data/games.csv";
 
-boolean loading = true;
+boolean loading = true, controllerError=false;
 
 Process runningGame;
+
+GamePadWrapper controller = new GamePadWrapper();
+
+int controlerErrorTimeStamp=0,lastControllUseTime=0;
+
+
+// 0=prevGame 1=prevLreaderBoard 2=nextLeaderBoard 3=play 4=nextGame
+int selectedButton =3;
 
 //main render function 
 //automcaticaly called by the render theread once every frame
 void draw(){
+  if(controllerError){
+    background(200);
+    textSize(100);
+    fill(0);
+    textAlign(CENTER,CENTER);
+    text("Controller Error!\n Restarting momnetrarily",width/2,height/2);
+    if(controlerErrorTimeStamp+5000 < millis()){
+     println("Exiting");
+     //exec("restartUi.sh");//run a script that re launches this program
+     //for some reason this controller library is incable of refreshing the list of controllers
+     //so if no controller is found we need to resetart this program to fetch the controllers again
+     exit();
+    }
+    return;
+  }
   background(0);//set the background color to black clearing anything currently on screen
   noStroke();//stroke with the 3D render can be kinda anoying
   
   //if loading do not display the normal UI instead display loading unill the load has completed
   if(loading){
-    //I know this is not the most scl;eable thing but it should be fine
+    //I know this is not the most scaleable thing but it should be fine
     fill(255);
     textSize(100);
     text("Loading ...",width/2,height/2);
   }else{
+    //hilight the currently selected button
+    // 0=prevGame 1=prevLreaderBoard 2=nextLeaderBoard 3=play 4=nextGame
+    switch(selectedButton){
+      case 0:
+        prevGameButton.setColor(#503B00, #ffc02e);
+        nextGameButton.setColor(0, 200);
+        prevLeaderBoard.setColor(0, 200);
+        nextLeaderBoard.setColor(0, 200);
+        playButton.setColor(#137600, #25E500);
+        break;
+      case 1:
+        prevGameButton.setColor(0, 200);
+        nextGameButton.setColor(0, 200);
+        prevLeaderBoard.setColor(#503B00, #ffc02e);
+        nextLeaderBoard.setColor(0, 200);
+        playButton.setColor(#137600, #25E500);
+        break;
+      case 2:
+        prevGameButton.setColor(0, 200);
+        nextGameButton.setColor(0, 200);
+        prevLeaderBoard.setColor(0, 200);
+        nextLeaderBoard.setColor(#503B00, #ffc02e);
+        playButton.setColor(#137600, #25E500);
+        break;
+      case 3:
+        prevGameButton.setColor(0, 200);
+        nextGameButton.setColor(0, 200);
+        prevLeaderBoard.setColor(0, 200);
+        nextLeaderBoard.setColor(0, 200);
+        playButton.setColor(#137600, #00DED1);
+        break;
+      case 4:
+        prevGameButton.setColor(0, 200);
+        nextGameButton.setColor(#503B00, #ffc02e);
+        prevLeaderBoard.setColor(0, 200);
+        nextLeaderBoard.setColor(0, 200);
+        playButton.setColor(#137600, #25E500);
+        break;
+      default:
+        prevGameButton.setColor(0, 200);
+        nextGameButton.setColor(0, 200);
+        prevLeaderBoard.setColor(0, 200);
+        nextLeaderBoard.setColor(0, 200);
+        playButton.setColor(#137600, #25E500);
+    }
+    
     //title bar
     fill(#002C73);
     uiRect(20,20,1240,130);
@@ -148,6 +222,13 @@ void mousePressed(){
 }
 
 void loadGames(){
+  //initilize the controller
+  ReadController.read(controller,this);
+  //if an error occors then stop loading farther
+  if(controllerError){
+    
+    return;
+  }
   //read the game info file
   String[] rawGameinfo = loadStrings(gameConfigFile);
   //pargse the contetnce into useable objects
@@ -158,7 +239,75 @@ void loadGames(){
       e.printStackTrace();
     }
   }
+  
+  //start the controller handler
+  thread("handleController");
   loading=false;
+}
+
+void handleController(){
+  while(true){
+    //while the UI is the focused program
+    if(focused){
+      //read in the any updates that have come from the controller
+      ReadController.read(controller,this);
+      //enfores a 250ms delay between processed inputs
+      if(lastControllUseTime+250 < millis()){
+        Game currentGame = games.get(currentGameIndex);
+        //if the left stick is pushed right
+        if(controller.leftStickX() > 0.3 && selectedButton!=4){
+          lastControllUseTime=millis();
+          //if on prev game and the current leaderBoard is not advanced
+          if(!currentGame.hasAdvancedLeaderBoard() && selectedButton==0){
+            selectedButton=3;
+          }else{
+            selectedButton++;
+          }
+        }
+        //if the left stick is pushed left
+        else if(controller.leftStickX() < -0.3 && selectedButton!=0){
+          lastControllUseTime=millis();
+          if(!currentGame.hasAdvancedLeaderBoard() && selectedButton==3){
+            selectedButton=0;
+          }else{
+            selectedButton--;
+          }
+        }
+        
+        if(controller.a()){
+          lastControllUseTime=millis();
+
+          switch(selectedButton){
+            case 0:
+              mouseX = (int)(prevGameButton.x + prevGameButton.lengthX/2);
+              mouseY = (int)(prevGameButton.y + prevGameButton.lengthY/2);
+              break;
+            case 1:
+              mouseX = (int)(prevLeaderBoard.x + prevLeaderBoard.lengthX/2);
+              mouseY = (int)(prevLeaderBoard.y + prevLeaderBoard.lengthY/2);
+              break;
+            case 2:
+              mouseX = (int)(nextLeaderBoard.x + nextLeaderBoard.lengthX/2);
+              mouseY = (int)(nextLeaderBoard.y + nextLeaderBoard.lengthY/2);
+              break;
+            case 3:
+              mouseX = (int)(playButton.x + playButton.lengthX/2);
+              mouseY = (int)(playButton.y + playButton.lengthY/2);
+              break;
+            case 4:
+              mouseX = (int)(nextGameButton.x + nextGameButton.lengthX/2);
+              mouseY = (int)(nextGameButton.y + nextGameButton.lengthY/2);
+              break;
+            default:
+              
+          }
+          mousePressed();
+        }
+      }
+    }else{
+      controller.reset();
+    }
+  }
 }
 
 //if the window is resized
