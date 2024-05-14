@@ -46,6 +46,7 @@ String gameConfigFile = "data/games.csv";
 
 boolean loading = true, controllerError=false;
 boolean animationRight = false, animationLeft= false;
+boolean gameStarted = false,launched=false;
 
 Process runningGame;
 
@@ -137,6 +138,10 @@ void draw(){
         playButton.setColor(#137600, #25E500);
     }
     
+    if((runningGame!=null && runningGame.isAlive()) || gameStarted){
+      playButton.setColor(#13B2BF, #00DED1);
+    }
+    
     //title bar
     fill(#002C73);
     uiRect(20,20,1240,130);
@@ -165,7 +170,31 @@ void draw(){
       if(animationPercent>=1){
         animationLeft=false;
       }
-    }else{
+    }else if(gameStarted){
+      float animationPercent = (millis()-animationStartTimestamp)/5000.0;
+      if(animationPercent<1){
+      float zoffset = 800*animationPercent*(animationPercent-2),xoffset = -200*animationPercent;
+      camera(defCameraX+xoffset, defCameraY, defCameraZ+zoffset, defCameraX+xoffset, defCameraY, zoffset, sin(animationPercent*PI/2),cos(animationPercent*PI/2),0);
+      
+      renderGameSelection(currentGameIndex);
+      
+      if(animationPercent >=0.65 && !launched){
+        try{
+          println("launching game");
+          runningGame = exec(games.get(currentGameIndex).getExe());
+        }catch (Exception e){
+          errorTimeStamp = millis();
+        }
+        launched=true;
+      }
+      }else{
+        camera(defCameraX-200, defCameraY, defCameraZ-800, defCameraX-200, defCameraY, -800, 1,0,0);
+      }
+      if(animationPercent>=2){
+        gameStarted=false;
+        launched=false;
+      }
+    }else {
     
       //draw the main pannel with the game info
       renderGameSelection(currentGameIndex);
@@ -257,12 +286,8 @@ void mousePressed(){
     }
     
     if(playButton.isMouseOver()){
-      try{
-        println("launching game");
-        runningGame = exec(currentGame.getExe());
-      }catch (Exception e){
-        errorTimeStamp = millis();
-      }
+      gameStarted=true;
+      animationStartTimestamp = millis();
     }
     
   }
