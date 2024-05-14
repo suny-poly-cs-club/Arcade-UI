@@ -3,6 +3,7 @@ UiText gameName;
 UiText leaderBoardTitle;
 UiText leaderBoardName;
 UiText[] leaderBoardContent = new UiText[10];
+UiText errorText;
 void initilizeText(){
   titleText = new UiText(ui,"SUNY Poly Arcade",640,55,130,CENTER,CENTER);
   gameName = new UiText(ui,"GAME NAME", 900, 185, 80, CENTER, CENTER);
@@ -11,6 +12,7 @@ void initilizeText(){
   for(int i=0;i<leaderBoardContent.length;i++){
     leaderBoardContent[i] = new  UiText(ui, (i+1)+") Name Name -- 69:69:69", 80, 300+50*i ,25, LEFT, CENTER);
   }
+  errorText = new UiText(ui, "ERROR!",640,512,150,CENTER,CENTER);
 }
 
 

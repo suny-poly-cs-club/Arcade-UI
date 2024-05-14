@@ -50,7 +50,7 @@ Process runningGame;
 
 GamePadWrapper controller = new GamePadWrapper();
 
-int controlerErrorTimeStamp=0,lastControllUseTime=0;
+int controlerErrorTimeStamp=0,lastControllUseTime=0,errorTimeStamp=0;
 
 
 // 0=prevGame 1=prevLreaderBoard 2=nextLeaderBoard 3=play 4=nextGame
@@ -138,7 +138,12 @@ void draw(){
     
     //draw the main pannel with the game info
     renderGameSelection(currentGameIndex);
+    if(errorTimeStamp+5000>millis() && millis()>5000){
+      fill(255,0,0);
+      errorText.draw();
+    }
   }
+  
   
 }
 
@@ -214,8 +219,12 @@ void mousePressed(){
     }
     
     if(playButton.isMouseOver()){
-      println("launching game");
-      runningGame = exec(currentGame.getExe());
+      try{
+        println("launching game");
+        runningGame = exec(currentGame.getExe());
+      }catch (Exception e){
+        errorTimeStamp = millis();
+      }
     }
     
   }
