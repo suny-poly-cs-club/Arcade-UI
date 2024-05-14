@@ -1,3 +1,3 @@
-Skinny Mann,C:\Users\nisky\source\repos\skinny-mann-arcade-edition\data\assets\skinny mann face.PNG,/path/to.exe,1,C:\Users\nisky\source\repos\skinny-mann-arcade-edition\leaderBoard.csv
+Skinny Mann,C:\Users\nisky\source\repos\skinny-mann-arcade-edition\data\assets\skinny mann face.PNG,C:\Users\nisky\Desktop\skinny mann compiled\skinny mann win64\run.cmd,1,C:\Users\nisky\source\repos\skinny-mann-arcade-edition\leaderBoard.csv
 Simple example,/path/to/game/icon,/path/to/game.exe,0,data/exampleSimpleLeaderboard.csv
 Complex example,/path/to/game/icon,/path/to/game.exe,1,data/exampleAdvancedLeaderboard.csv

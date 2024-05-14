@@ -41,6 +41,8 @@ String gameConfigFile = "data/games.csv";
 
 boolean loading = true;
 
+Process runningGame;
+
 //main render function 
 //automcaticaly called by the render theread once every frame
 void draw(){
@@ -135,6 +137,11 @@ void mousePressed(){
       }else{
         currentGameIndex = 0;
       }
+    }
+    
+    if(playButton.isMouseOver()){
+      println("launching game");
+      runningGame = exec(currentGame.getExe());
     }
     
   }
