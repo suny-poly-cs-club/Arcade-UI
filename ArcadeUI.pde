@@ -18,7 +18,7 @@ void setup(){
   //this text is renderd when textSize is called for the first time
   //while this has a major seed benifit it causes test that is sized farm the the initial size to have noticable scale ing artifacts
   
-  Game.initClass(this);
+  Game.initClass(this,(int)(600*ui.scale()));
   
   //initilize text and buttons that require the UI Frame
   initilizeText();
@@ -34,6 +34,8 @@ UiFrame ui;
 ArrayList<Game> games = new ArrayList<>();
 
 int currentLeaderBoardLevel =0;
+
+int currentGameIndex =0;
 
 String gameConfigFile = "data/games.csv";
 
@@ -59,7 +61,7 @@ void draw(){
     titleText.draw();
     
     //draw the main pannel with the game info
-    renderGameSelection(0);
+    renderGameSelection(currentGameIndex);
   }
   
 }
@@ -106,6 +108,38 @@ void renderGameSelection(int gameId){
   playButton.draw();
 }
 
+void mousePressed(){
+  if(!loading){
+    Game currentGame = games.get(currentGameIndex);
+    if(currentGame.leaderBoardPresent()&&currentGame.hasAdvancedLeaderBoard()){
+        if(nextLeaderBoard.isMouseOver()){
+          currentLeaderBoardLevel = currentGame.nextLeaderBoard(currentLeaderBoardLevel);
+        }
+        if(prevLeaderBoard.isMouseOver()){
+          currentLeaderBoardLevel = currentGame.prevLeaderBoard(currentLeaderBoardLevel);
+        }
+    }
+    
+    if(prevGameButton.isMouseOver()){
+      currentLeaderBoardLevel=0;
+      if(currentGameIndex >0){
+        currentGameIndex--;
+      }else{
+        currentGameIndex = games.size()-1;
+      }
+    }
+    if(nextGameButton.isMouseOver()){
+      currentLeaderBoardLevel=0;
+      if(currentGameIndex <games.size()-1){
+        currentGameIndex++;
+      }else{
+        currentGameIndex = 0;
+      }
+    }
+    
+  }
+}
+
 void loadGames(){
   //read the game info file
   String[] rawGameinfo = loadStrings(gameConfigFile);
@@ -124,6 +158,11 @@ void loadGames(){
 void windowResized() {
   //tell the UI Frame to recalculate
   ui.reScale();
+  //get the game images to resize 
+  Game.sRescale(ui.scale());
+  for(int i=0;i<games.size();i++){
+    games.get(i).rescale(ui.scale());
+  }
 }
 
 

@@ -7,7 +7,7 @@ class Game{
      name =  data[0];
      try{
        img = dataSource.loadImage(data[1]);
-       img.resize(600,600);
+       img.resize(imageScale,imageScale);
      }catch (Exception e){
        System.err.println("error loading image for "+name);
        e.printStackTrace();
@@ -41,9 +41,13 @@ class Game{
   
   private LeaderBoard leaderBoard;
   
-  static void initClass(PApplet source){
+  private static int imageScale ;
+  
+  static void initClass(PApplet source,int imgScale){
     dataSource=source;
     defaultImage = dataSource.loadImage("data/defaultGameImage.png");
+    defaultImage.resize(imgScale,imgScale);
+    imageScale = imgScale;
   }
   
   public PImage getImg(){
@@ -88,11 +92,20 @@ class Game{
   
   void populateScores(UiText[] text,int level){
     for(int i=0;i<text.length;i++){
-      text[i].setText(leaderBoard.getPosition(level,i)+"");
+      text[i].setText((i+1)+") "+leaderBoard.getPosition(level,i));
     }
   }
   
   public void reloadLeaderBaord(){
     leaderBoard = new LeaderBoard(advancedLeaderBaord,dataSource.loadStrings(leaderBoardFile));
+  }
+  
+  public void rescale(float scale){
+    if(img!=null)
+      img.resize((int)(scale*600),(int)(scale*600));
+  }
+  
+  public static void sRescale(float scale){
+    defaultImage.resize((int)(scale*600),(int)(scale*600));
   }
 }
