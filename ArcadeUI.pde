@@ -28,6 +28,10 @@ void setup(){
   initilizeText();
   initilizeButtons();
   
+  //generate some stars for the background
+  for(int i=0;i<200;i++){
+    updateStars();
+  }
   
   loading=true;
   //load all the game info on a seperate thread incase the drive is slow
@@ -58,6 +62,8 @@ float defCameraFOV = 60 * DEG_TO_RAD; // at least for now
 float defCameraX = width / 2.0f;
 float defCameraY = height / 2.0f;
 float defCameraZ = defCameraY / ((float) Math.tan(defCameraFOV / 2.0f));
+
+ArrayList<Star> stars = new ArrayList<>();
 
 
 // 0=prevGame 1=prevLreaderBoard 2=nextLeaderBoard 3=play 4=nextGame
@@ -205,7 +211,10 @@ void draw(){
     }
   }
   
-  
+  if(focused){
+    renderStars();
+    updateStars();
+  }
 }
 
 /**draws the main part of the selection UI 
@@ -248,6 +257,23 @@ void renderGameSelection(int gameId){
   }
   //play button
   playButton.draw();
+}
+
+void renderStars(){
+  for(int i=0;i<stars.size();i++){
+    stars.get(i).draw();
+  }
+}
+
+void updateStars(){
+  for(int i=0;i<stars.size();i++){
+    if(stars.get(i).update(i)){
+      i--;
+    }
+  }
+  if(stars.size()<1300 && frameCount %4 ==0){
+    stars.add(new Star());
+  }
 }
 
 void mousePressed(){
