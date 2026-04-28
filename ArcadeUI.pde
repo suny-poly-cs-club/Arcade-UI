@@ -52,6 +52,9 @@ boolean loading = true, controllerError=false;
 boolean animationRight = false, animationLeft= false;
 boolean gameStarted = false,launched=false;
 
+boolean updateFPS = false;
+boolean previousFocused = true;
+
 Process runningGame;
 
 GamePadWrapper controller = new GamePadWrapper();
@@ -215,6 +218,19 @@ void draw(){
     renderStars();
     updateStars();
   }
+  
+  if(updateFPS){
+    updateFPS = false;
+    if(focused){
+      frameRate(60);
+    } else {
+      frameRate(2);
+    }
+  }
+  if(focused != previousFocused){
+    updateFPS = true;
+  }
+  previousFocused = focused;
 }
 
 /**draws the main part of the selection UI 
