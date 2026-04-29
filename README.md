@@ -12,7 +12,7 @@ The main interface for the arcade cabinet. The system to choose the game to play
 4. The seccond value is the file path to the game icon
 5. The third value is the path to the game launch script / game execuable
 6. The fourth value id the leaderboard mode: 0 for simple mode, 1 for complex mode. More on the leaderboards below
-7. The fifth and final value is the path the the game's leaderboard csv file
+7. The fifth and final value is the path the the game's leaderboard csv file  
 All togther an example line in the game file might look like this:
 ```csv
 Example game,/path/to/game/icon.png,/path/to/launc/script.sh,0,/path/to/leaderboard.csv
