@@ -8,21 +8,21 @@ The main interface for the arcade cabinet. The system to choose the game to play
 # Configuring games
 1. Edit `data/games.csv`
 2. Add a new line for your game
-3. The first value(before the first cama) is the display name of the game
-4. The seccond value is the file path to the game icon
-5. The third value is the path to the game launch script / game execuable
+3. The first value(before the first coma) is the display name of the game
+4. The second value is the file path to the game icon
+5. The third value is the path to the game launch script / game executable
 6. The fourth value id the leaderboard mode: 0 for simple mode, 1 for complex mode. More on the leaderboards below
 7. The fifth and final value is the path the the game's leaderboard csv file  
 
-All togther an example line in the game file might look like this:
+All together an example line in the game file might look like this:
 ```csv
-Example game,/path/to/game/icon.png,/path/to/launc/script.sh,0,/path/to/leaderboard.csv
+Example game,/path/to/game/icon.png,/path/to/launch/script.sh,0,/path/to/leaderboard.csv
 ```
 
-# Leaderbaord System
-The big feature of this arcade UI system if the custom leaderbaord system.  
-2 types of leaderboards are supported: Simple and Complex  
-All leaderbaords are stored in csv files
+# Leaderboard System
+The big feature of this arcade UI system if the custom leaderboard  system.  
+2 types of leaderboard are supported: Simple and Complex  
+All leaderboards are stored in csv files
 
 ### Simple leaderboard (mode 0)
 This leaderboard type is based on a single list of names and scores  
@@ -41,7 +41,7 @@ Fil --- 200
 Rik --- 0
 ```
 
-Note: it is up to the gane to order the scores correctly
+Note: it is up to the game to order the scores correctly
 
 ### Complex loaderboard (mode 1)
 This mode is also known as the multiple levels mode. This mode allows for multiple levels / catagories to have unique score boards on a single game.  
@@ -52,4 +52,4 @@ level 1 name,name 1,1:36,name 2,2:22,name 3,2:58,name 4,4:02,name 5,4:10,name 6,
 level 2 name,name 1,1:36,name 2,2:22,name 3,2:58,name 4,4:02,name 5,4:10,name 6,5:34,name 7,5:30,name 8,6:59,name 9,7:57,name 10,1685:55
 ```
 
-Note: it is up to the gane to order the scores correctly
+Note: it is up to the game to order the scores correctly
