@@ -1,4 +1,5 @@
 import net.java.games.input.*;
+//class to handle the storing and mainaing of the current controller state
 class GamePadWrapper{
   private boolean[] buttons = new boolean[10];//a b x y left right select start leftStick rightStick
   private boolean[] dpad = new boolean[4];//up right down left
@@ -6,6 +7,7 @@ class GamePadWrapper{
   private float[] rightStick = new float[2];
   private float triggers;
   
+  //set all buttons and sticks back to their default state
   void reset(){
     for(int i=0;i<buttons.length;i++){
       buttons[i]=false;
@@ -97,6 +99,7 @@ class GamePadWrapper{
     return buttons[9];
   }
   
+  //process a controller event
   public void updateComponent(Component.Identifier component,float value){
     if(component.equals(Component.Identifier.Axis.X)){
       leftStick[0]=value;

@@ -1,3 +1,4 @@
+//sorry if the documentaion / comments are lacking in some places. I wrote this project in 2024. But its still prbly better then alot of open source projects -jsd(2026)
 import net.java.games.input.*;//theese imports are nessary to get processing to include the library in the export
 import net.java.games.util.plugins.*;
 import net.java.games.util.*;
@@ -214,21 +215,29 @@ void draw(){
     }
   }
   
+  //if the UI is the focused window
   if(focused){
+    //draw and update the stars
     renderStars();
     updateStars();
+  } else { //if it is not focused
+    try{
+      //put this thread to sleep for 15 ms
+      Thread.sleep(15);
+    } catch (Exception e){ }
   }
   
-  if(updateFPS){
+  if(updateFPS){//if the frame rate should be update
     updateFPS = false;
     if(focused){
-      frameRate(60);
+      frameRate(60);//set the FPS to 60 if the window is focused
     } else {
-      frameRate(2);
+      frameRate(2);//set the FPS to 2 if the window is not focused
     }
   }
+  //if the focus of the window changed
   if(focused != previousFocused){
-    updateFPS = true;
+    updateFPS = true;//have the FPS update
   }
   previousFocused = focused;
 }
@@ -275,12 +284,14 @@ void renderGameSelection(int gameId){
   playButton.draw();
 }
 
+//draw all the stars
 void renderStars(){
   for(int i=0;i<stars.size();i++){
     stars.get(i).draw();
   }
 }
 
+//update each star, moving it to the right a little bit
 void updateStars(){
   for(int i=0;i<stars.size();i++){
     if(stars.get(i).update(i)){
@@ -293,17 +304,17 @@ void updateStars(){
 }
 
 void mousePressed(){
-  if(!loading){
-    Game currentGame = games.get(currentGameIndex);
-    if(currentGame.leaderBoardPresent()&&currentGame.hasAdvancedLeaderBoard()){
-        if(nextLeaderBoard.isMouseOver()){
+  if(!loading){//if the system is not in the process of loading
+    Game currentGame = games.get(currentGameIndex);//get the currenly selected game
+    if(currentGame.leaderBoardPresent() && currentGame.hasAdvancedLeaderBoard()){//if this game has an advanced leaderboard
+        if(nextLeaderBoard.isMouseOver()){ // actions for next and prevous level buttons
           currentLeaderBoardLevel = currentGame.nextLeaderBoard(currentLeaderBoardLevel);
         }
         if(prevLeaderBoard.isMouseOver()){
           currentLeaderBoardLevel = currentGame.prevLeaderBoard(currentLeaderBoardLevel);
         }
     }
-    
+    //prevous game button
     if(prevGameButton.isMouseOver()){
       currentLeaderBoardLevel=0;
       prevousGameIndex = currentGameIndex;
@@ -315,6 +326,7 @@ void mousePressed(){
       animationLeft=true;
       animationStartTimestamp = millis();
     }
+    //next game button
     if(nextGameButton.isMouseOver()){
       currentLeaderBoardLevel=0;
       prevousGameIndex = currentGameIndex;
@@ -327,6 +339,7 @@ void mousePressed(){
       animationStartTimestamp = millis();
     }
     
+    //play game button
     if(playButton.isMouseOver()){
       gameStarted=true;
       animationStartTimestamp = millis();
@@ -336,8 +349,10 @@ void mousePressed(){
 }
 
 void loadGames(){
+  println("Starting load");
   //initilize the controller
   ReadController.read(controller,this);
+  println("Controller initialized");
   //if an error occors then stop loading farther
   if(controllerError){
     
@@ -345,10 +360,12 @@ void loadGames(){
   }
   //read the game info file
   String[] rawGameinfo = loadStrings(gameConfigFile);
+  println("Loaded raw game info");
   //pargse the contetnce into useable objects
   for(String gameInfo: rawGameinfo){
     try{
       games.add(new Game(gameInfo.split(",")));
+      println("Loaded info for game");
     }catch (Exception e){
       e.printStackTrace();
     }
@@ -356,6 +373,7 @@ void loadGames(){
   
   //start the controller handler
   thread("handleController");
+  println("started controller thread");
   loading=false;
 }
 
@@ -388,9 +406,10 @@ void handleController(){
           }
         }
         
-        if(controller.a()){
+        if(controller.a()){//if the "a" button on the controller is pressed
           lastControllUseTime=millis();
-
+          //chcek what button is currenly selected
+          //move the mouse over that button
           switch(selectedButton){
             case 0:
               mouseX = (int)(prevGameButton.x + prevGameButton.lengthX/2);
@@ -415,11 +434,15 @@ void handleController(){
             default:
               
           }
+          //simuilate a mouse click
           mousePressed();
         }
       }
-    }else{
-      controller.reset();
+    }else{//if the window is not focused
+      controller.reset();//reset the state of the controller
+      try {
+        Thread.sleep(15);//put this thread to sleep for 15ms. effectily reducing the CPU suilization of this thread to 0
+      } catch (Exception e){}
     }
   }
 }

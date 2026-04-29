@@ -1,4 +1,5 @@
 import java.util.ArrayList;
+//class that represents a single game's leaderboard
 class LeaderBoard{
   public LeaderBoard(boolean advacned, String[] fileContent){
     if(advacned){

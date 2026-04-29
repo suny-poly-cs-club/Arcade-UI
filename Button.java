@@ -1,5 +1,5 @@
 //button class V1.2.0
-/* Part of the Skinny Mann project https://www.cbi-games.org/skinny_mann.html
+/* Part of the Skinny Mann project https://cbi-games.org/skinny_mann.html
    Copyright (c) 2022-2023 jSdCool 
    
    This class is part of the Skinny mann simple UI tool kit 

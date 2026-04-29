@@ -1,4 +1,4 @@
-/* Part of the Skinny Mann project https://www.cbi-games.org/skinny_mann.html
+/* Part of the Skinny Mann project https://cbi-games.org/skinny_mann.html
    Copyright (c) 2023-2024 jSdCool 
    
    This class is part of the Skinny mann simple UI tool kit 

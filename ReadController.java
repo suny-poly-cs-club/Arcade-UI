@@ -29,14 +29,13 @@ class ReadController{
       }
 
       for (int i = 0; i < controllers.length; i++) {
-        if(!controllers[i].getType().equals(Controller.Type.GAMEPAD)&&!controllers[i].getType().equals(Controller.Type.STICK)) {
+        //only check inputs from gamepads or fligh sticks (on linux, the arcade controlls show up as a flight stick)
+        if(!controllers[i].getType().equals(Controller.Type.GAMEPAD) && !controllers[i].getType().equals(Controller.Type.STICK)) {
           continue;
         }
         /* Remember to poll each one */
         controllers[i].poll();
         
-        
-
         /* Get the controllers event queue */
         EventQueue queue = controllers[i].getEventQueue();
         
@@ -46,41 +45,12 @@ class ReadController{
         /* For each object in the queue */
         while (queue.getNextEvent(event)) {
 
-          //StringBuffer buffer = new StringBuffer(controllers[i].getName());
-          //buffer.append(" at ");
-         // buffer.append(event.getNanos()).append(", ");
           Component comp = event.getComponent();
-          //buffer.append(comp.getName()).append(" changed to ");
+          //get the new value of the attached component and pass it to the gamepad wrapper to handle
           float value = event.getValue();
           gp.updateComponent(comp.getIdentifier(),value);
-          /*
-           * Check the type of the component and display an
-           * appropriate value
-           */
-          //if (comp.isAnalog()) {
-          //  buffer.append(value);
-          //} else {
-          //  if (value == 1.0f) {
-          //    buffer.append("On");
-          //  } else {
-          //    buffer.append("Off");
-          //  }
-          //}
-          ////System.out.println(buffer.toString());
-          //System.out.println(event+" "+comp.getIdentifier());
         }
         
       }
-
-      /*
-       * Sleep for 20 milliseconds, in here only so the example doesn't
-       * thrash the system.
-       */
-      //try {
-      //  Thread.sleep(20);
-      //} catch (InterruptedException e) {
-      //  // TODO Auto-generated catch block
-      //  e.printStackTrace();
-      //}
   }
 }
