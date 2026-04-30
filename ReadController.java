@@ -24,7 +24,7 @@ class ReadController{
         aui.controlerErrorTimeStamp = aui.millis();
         JFrame jf=new JFrame();
         jf.setAlwaysOnTop(true);
-        JOptionPane.showMessageDialog(jf,"We were not able to find any controller devices connected to this system.\nA GamePad controller/joystick controller is required to play this version of the game.\nList of found controll devices ======\n"+conectedControllers+"======\nThe game will now close","No Controllers Found!", JOptionPane.ERROR_MESSAGE);
+        JOptionPane.showMessageDialog(jf,"We were not able to find any controller devices connected to this system.\nA GamePad controller/joystick controller is required to play this version of the game.\nList of found controll devices ======\n"+conectedControllers+"======\nThe program will now close","No Controllers Found!", JOptionPane.ERROR_MESSAGE);
         System.exit(420);
       }
 
@@ -34,7 +34,14 @@ class ReadController{
           continue;
         }
         /* Remember to poll each one */
-        controllers[i].poll();
+        if(!controllers[i].poll()){
+          aui.controllerError = true;
+          aui.controlerErrorTimeStamp = aui.millis();
+          JFrame jf=new JFrame();
+          jf.setAlwaysOnTop(true);
+          JOptionPane.showMessageDialog(jf,"Controller Disconnected!\n======\n======\nThe program will now close!","Controller Disconnected!", JOptionPane.ERROR_MESSAGE);
+          System.exit(420);
+        }
         
         /* Get the controllers event queue */
         EventQueue queue = controllers[i].getEventQueue();
