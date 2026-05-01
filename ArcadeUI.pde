@@ -52,6 +52,8 @@ String gameConfigFile = "data/games.csv";
 boolean loading = true, controllerError=false;
 boolean animationRight = false, animationLeft= false;
 boolean gameStarted = false,launched=false;
+boolean idle = false; // if the machine has been touched recently
+boolean pIdle = false;
 
 boolean updateFPS = false;
 boolean previousFocused = true;
@@ -230,16 +232,21 @@ void draw(){
   if(updateFPS){//if the frame rate should be update
     updateFPS = false;
     if(focused){
-      frameRate(60);//set the FPS to 60 if the window is focused
+      if(idle){
+        frameRate(10);
+      } else {
+        frameRate(60);//set the FPS to 60 if the window is focused
+      }
     } else {
       frameRate(2);//set the FPS to 2 if the window is not focused
     }
   }
   //if the focus of the window changed
-  if(focused != previousFocused){
+  if(focused != previousFocused || idle != pIdle){
     updateFPS = true;//have the FPS update
   }
   previousFocused = focused;
+  pIdle = idle;
 }
 
 /**draws the main part of the selection UI 
@@ -383,6 +390,10 @@ void handleController(){
     if(focused){
       //read in the any updates that have come from the controller
       ReadController.read(controller,this);
+      
+      //idle if not touched for 10 mins
+      idle = ReadController.lastInput + 600000000000l < System.nanoTime();
+      
       //enfores a 250ms delay between processed inputs
       if(lastControllUseTime+250 < millis()){
         Game currentGame = games.get(currentGameIndex);
@@ -437,6 +448,11 @@ void handleController(){
           //simuilate a mouse click
           mousePressed();
         }
+      }
+      if(idle){
+        try {
+          Thread.sleep(15);//put this thread to sleep for 15ms. effectily reducing the CPU suilization of this thread to 0
+        } catch (Exception e){}
       }
     }else{//if the window is not focused
       controller.reset();//reset the state of the controller

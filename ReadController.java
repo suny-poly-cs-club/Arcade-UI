@@ -3,6 +3,8 @@ import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 
 class ReadController{
+  static long lastInput;
+  
   static void read(GamePadWrapper gp,ArcadeUI aui){
     /* Get the available controllers */
       Controller[] controllers = ControllerEnvironment
@@ -48,10 +50,14 @@ class ReadController{
         
         /* Create an event object for the underlying plugin to populate */
         Event event = new Event();
+        long now = System.nanoTime();
+        if(lastInput > now){//in the extreamly rair case of integer overflow
+          lastInput = now;
+        }
         
         /* For each object in the queue */
         while (queue.getNextEvent(event)) {
-
+          lastInput = now;//store when the last input was detected so we can save system resources when the cabinate is not in use
           Component comp = event.getComponent();
           //get the new value of the attached component and pass it to the gamepad wrapper to handle
           float value = event.getValue();
