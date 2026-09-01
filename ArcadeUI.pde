@@ -257,15 +257,13 @@ void draw(){
   if(focused != previousFocused || idle != pIdle){
     updateFPS = true;//have the FPS update
   }
+  //reload the leader boards when the program regains focus
+  if(focused && !previousFocused){
+    releadLeaderBoards = true;
+    println("reload loeader boards");
+  }
   previousFocused = focused;
   pIdle = idle;
-  
-  //detect when the game closes
-  if(checkGameAlive && !runningGame.isAlive()){
-    checkGameAlive = false;
-    //reload the leader board
-    releadLeaderBoards = true;
-  }
 }
 
 /**draws the main part of the selection UI 
