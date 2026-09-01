@@ -1,4 +1,4 @@
-//sorry if the documentaion / comments are lacking in some places. I wrote this project in 2024. But its still prbly better then alot of open source projects -jsd(2026)
+//sorry if the documentaion / comments are lacking in some places. I wrote this project in 2024. But its still prbly better then a lot of open source projects -jsd(2026)
 import net.java.games.input.*;//theese imports are nessary to get processing to include the library in the export
 import net.java.games.util.plugins.*;
 import net.java.games.util.*;
@@ -57,6 +57,8 @@ boolean pIdle = false;
 
 boolean updateFPS = false;
 boolean previousFocused = true;
+boolean releadLeaderBoards = false;
+boolean checkGameAlive = false;
 
 Process runningGame;
 
@@ -194,6 +196,7 @@ void draw(){
         try{
           println("launching game");
           runningGame = exec(games.get(currentGameIndex).getExe());
+          checkGameAlive = true;
         }catch (Exception e){
           errorTimeStamp = millis();
         }
@@ -213,6 +216,15 @@ void draw(){
       if(errorTimeStamp+5000>millis() && millis()>5000){
         fill(255,0,0);
         errorText.draw();
+      }
+      //do the leaderboard reload on the main thread
+      if(releadLeaderBoards){
+        releadLeaderBoards = false;
+        //go through each game
+        for(Game game: games){
+          //have each game reload its leader board
+          game.reloadLeaderBaord();
+        }
       }
     }
   }
@@ -247,6 +259,13 @@ void draw(){
   }
   previousFocused = focused;
   pIdle = idle;
+  
+  //detect when the game closes
+  if(checkGameAlive && !runningGame.isAlive()){
+    checkGameAlive = false;
+    //reload the leader board
+    releadLeaderBoards = true;
+  }
 }
 
 /**draws the main part of the selection UI 
